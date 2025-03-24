@@ -27,7 +27,7 @@ public class Seller {
 	public Map<String, Object> currencies;
 	
 	public Seller(Firestore db, String seller) throws HttpError{
-		if(seller == null || seller.isBlank()) throw new BadRequest("seller id is blank");
+		if(seller == null ) throw new BadRequest("seller id is blank");
 		try {
 			DocumentSnapshot ds = db.collection("sellers").document(seller).get().get();
 			fromDocumentSnapshot(ds);

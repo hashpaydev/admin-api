@@ -20,6 +20,28 @@
 	    <artifactId>jetty-server</artifactId>
 	    <version>11.0.20</version>
 	</dependency>
+	  <dependency>
+		  <groupId>com.portto.sdk</groupId>
+		  <artifactId>solana</artifactId>
+		  <version>0.1.0</version>
+		  <type>pom</type>
+	  </dependency>
+	  <dependency>
+		  <groupId>wf.bitcoin</groupId>
+		  <artifactId>bitcoin-rpc-client</artifactId>
+		  <version>1.2.3</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>com.mmorrell</groupId>
+		  <artifactId>solanaj</artifactId>
+		  <version>1.19.2</version>
+	  </dependency>
+
+	  <dependency>
+		  <groupId>org.web3j</groupId>
+		  <artifactId>core</artifactId>
+		  <version>4.9.8</version>
+	  </dependency>
 	<dependency>
 	    <groupId>org.eclipse.jetty</groupId>
 	    <artifactId>jetty-servlet</artifactId>
@@ -36,4 +58,16 @@
 	    <version>2.0.9</version>
 	</dependency>
   </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
