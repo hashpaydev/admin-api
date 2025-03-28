@@ -4,9 +4,7 @@ import abek.exceptions.BadRequest;
 import abek.exceptions.HttpError;
 import com.google.cloud.firestore.*;
 import com.google.firebase.auth.UserRecord;
-import com.google.gson.Gson;
 
-import hashpay.entity.Seller;
 import abek.endpoint.AuthEndpoint;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +19,6 @@ import static com.google.firebase.cloud.FirestoreClient.getFirestore;
 
 public class EnableCurrency extends AuthEndpoint {
     private static final long serialVersionUID = 1L;
-    //private static final Gson gson = new Gson();
 
     private static final List<String> SUPPORTED_NETWORKS = Arrays.asList("SOL", "ETH", "TRX");
     private static final List<String> SUPPORTED_CURRENCIES = Arrays.asList("USDC", "USDT", "EUR");
@@ -36,7 +33,7 @@ public class EnableCurrency extends AuthEndpoint {
                 throw new BadRequest("DB001", "Failed to initialize Firestore");
             }
             String sellerId = user.getUid();
-            Seller seller = new Seller(db, sellerId);
+//            Seller seller = new Seller(db, sellerId);
             String network = getRequiredParameter(request, "network").toUpperCase();
             String currency = getRequiredParameter(request, "currency").toUpperCase();
             String address = getRequiredParameter(request, "add");
@@ -49,7 +46,6 @@ public class EnableCurrency extends AuthEndpoint {
                 throw new BadRequest("CUR002", "Unsupported currency: " + currency);
             }
 
-            // Validate the address
             boolean isValidAddress = validateAddress(network, address);
             if (!isValidAddress) {
                 throw new BadRequest("ADR002", "Invalid wallet address for network " + network);
@@ -57,20 +53,15 @@ public class EnableCurrency extends AuthEndpoint {
 
             DocumentReference sellerRef = db.collection("sellers").document(sellerId);
 
-            // Prepare updates
             Map<String, Object> updates = new HashMap<>();
 
-            // Add/update the currency-specific address
             String currencyNetworkKey = currency + "_" + network;
             updates.put(currencyNetworkKey, address);
 
-            // Update timestamp
             updates.put("updatedAt", FieldValue.serverTimestamp());
 
-            // Perform the update
             sellerRef.set(updates, SetOptions.merge()).get();
 
-            // Prepare response
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("status", "success");
             responseData.put("network", network);
