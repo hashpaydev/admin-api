@@ -16,7 +16,6 @@ import java.util.concurrent.ExecutionException;
 
 import static com.google.firebase.cloud.FirestoreClient.getFirestore;
 
-
 public class GetPayoutProfile extends AuthEndpoint {
 
     private static final long serialVersionUID = 1L;
@@ -43,60 +42,20 @@ public class GetPayoutProfile extends AuthEndpoint {
                 throw new BadRequest("SELLER001", "Seller not found");
             }
 
-            Map<String, Object> sellerData = new HashMap<>();
-            sellerData.put("sellerId", sellerId);
-
-            List<Map<String, Object>> payoutAddresses = new ArrayList<>();
+            Map<String, Object> responseData = new HashMap<>();
 
             for (String network : SUPPORTED_NETWORKS) {
-                String networkLower = network.toLowerCase();
+                for (String currency : SUPPORTED_CURRENCIES) {
+                    String currencyKey = currency + "_" + network;
 
-                if (sellerDoc.contains(networkLower)) {
-                    String address = sellerDoc.getString(networkLower);
-
-                    Map<String, Boolean> currencyStatuses = new HashMap<>();
-
-                    if (sellerDoc.contains("currencyStatuses")) {
-
-                        Map<String, Object> allStatuses = (Map<String, Object>) sellerDoc.get("currencyStatuses");
-
-                        if (allStatuses != null && allStatuses.containsKey(network)) {
-
-                            Map<String, Boolean> networkStatuses = (Map<String, Boolean>) allStatuses.get(network);
-                            if (networkStatuses != null) {
-                                currencyStatuses = networkStatuses;
-                            }
+                    if (sellerDoc.contains(currencyKey)) {
+                        String address = sellerDoc.getString(currencyKey);
+                        if (address != null && !address.trim().isEmpty()) {
+                            responseData.put(currencyKey, address);
                         }
                     }
-
-                    Map<String, Object> networkDetails = new HashMap<>();
-                    networkDetails.put("network", network);
-                    networkDetails.put("address", address);
-                    networkDetails.put("currencies", new ArrayList<>());
-
-                    for (String currency : SUPPORTED_CURRENCIES) {
-                        Map<String, Object> currencyDetails = new HashMap<>();
-                        currencyDetails.put("currency", currency);
-
-                        boolean isEnabled = currencyStatuses.getOrDefault(currency, false);
-                        currencyDetails.put("enabled", isEnabled);
-
-                        ((List<Map<String, Object>>) networkDetails.get("currencies")).add(currencyDetails);
-                    }
-
-                    payoutAddresses.add(networkDetails);
                 }
             }
-
-            sellerData.put("payoutAddresses", payoutAddresses);
-
-            if (sellerDoc.contains("updatedAt")) {
-                sellerData.put("updatedAt", sellerDoc.get("updatedAt"));
-            }
-
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("status", "success");
-            responseData.put("seller", sellerData);
 
             return responseData;
         } catch (InterruptedException | ExecutionException e) {

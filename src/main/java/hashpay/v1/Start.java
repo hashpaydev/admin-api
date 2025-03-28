@@ -48,7 +48,7 @@ public class Start
 
 //		handler.addServlet(hashpay.v1.SetPayoutAdrEndpoint.class, "/v1/setPayoutAddress");
 		handler.addServlet(hashpay.v1.EnableCurrency.class, "/v1/EnableCurrency");
-		handler.addServlet(hashpay.v1.DisableCurrency.class,"/v1/DisableCurrency");
+		handler.addServlet(DeleteCurrency.class,"/v1/DisableCurrency");
 		handler.addServlet(hashpay.v1.GetPayoutProfile.class, "/v1/payout-profile");
 
 		handler.addServlet(hashpay.v1.SetDomain.class, "/v1/SetDomain");

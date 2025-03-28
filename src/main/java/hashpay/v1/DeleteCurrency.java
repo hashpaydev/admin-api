@@ -18,8 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import static com.google.firebase.cloud.FirestoreClient.getFirestore;
 
-
-public class DisableCurrency extends AuthEndpoint {
+public class DeleteCurrency extends AuthEndpoint {
     private static final long serialVersionUID = 1L;
     //private static final Gson gson = new Gson();
 
@@ -56,33 +55,31 @@ public class DisableCurrency extends AuthEndpoint {
                 throw new BadRequest("CUR002", "Unsupported currency: " + currency);
             }
 
-            Map<String, Boolean> currencyStatusMap = new HashMap<>();
-            if (sellerDoc.contains("currencyStatuses." + network)) {
-                @SuppressWarnings("unchecked")
-                Map<String, Boolean> existingStatuses = (Map<String, Boolean>) sellerDoc.get("currencyStatuses." + network);
-                if (existingStatuses != null) {
-                    currencyStatusMap.putAll(existingStatuses);
-                }
-            }
-
-            boolean wasAlreadyDisabled = !currencyStatusMap.containsKey(currency) || !currencyStatusMap.get(currency);
-            currencyStatusMap.put(currency, false);
-
+            // Prepare update map
             Map<String, Object> updates = new HashMap<>();
-            updates.put("currencyStatuses." + network, currencyStatusMap);
+
+            // Remove currency-specific field
+            String currencyNetworkKey = currency + "_" + network;
+            updates.put(currencyNetworkKey, FieldValue.delete());
+
+            // Update currency statuses
+            Map<String, Object> currencyStatusesUpdate = new HashMap<>();
+            currencyStatusesUpdate.put(currency, FieldValue.delete());
+            updates.put("currencyStatuses." + network, currencyStatusesUpdate);
+
+            // Update timestamp
             updates.put("updatedAt", FieldValue.serverTimestamp());
 
+            // Perform the update
             sellerRef.set(updates, SetOptions.merge()).get();
 
+            // Prepare response
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("status", "success");
             responseData.put("network", network);
             responseData.put("currency", currency);
-            responseData.put("currencyStatuses", currencyStatusMap);
+            responseData.put("message", "Seller currency deleted successfully");
             responseData.put("sellerId", sellerId);
-            responseData.put("message", wasAlreadyDisabled ?
-                    "Currency was already disabled, no change needed" :
-                    "Seller currency disabled successfully");
 
             return responseData;
         } catch (InterruptedException | ExecutionException e) {

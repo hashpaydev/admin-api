@@ -39,7 +39,7 @@ public class EnableCurrency extends AuthEndpoint {
             Seller seller = new Seller(db, sellerId);
             String network = getRequiredParameter(request, "network").toUpperCase();
             String currency = getRequiredParameter(request, "currency").toUpperCase();
-            String address = request.getParameter("add");
+            String address = getRequiredParameter(request, "add");
 
             if (!SUPPORTED_NETWORKS.contains(network)) {
                 throw new BadRequest("NET001", "Invalid or unsupported network: " + network);
@@ -49,50 +49,34 @@ public class EnableCurrency extends AuthEndpoint {
                 throw new BadRequest("CUR002", "Unsupported currency: " + currency);
             }
 
-            String networkField = network.toLowerCase();
-            String finalAddress = null;
-
-
-            if (address == null || address.trim().isEmpty()) {
-
-                String existingAddress = seller.doc.getString(networkField);
-                if (existingAddress != null && !existingAddress.trim().isEmpty()) {
-                    finalAddress = existingAddress;
-                } else {
-                    throw new BadRequest("ADR001",
-                            "No address set for network " + network + ". Please provide an address parameter.");
-                }
-            } else {
-                finalAddress = address.trim();
-            }
-
-
-            boolean isValidAddress = validateAddress(network, finalAddress);
+            // Validate the address
+            boolean isValidAddress = validateAddress(network, address);
             if (!isValidAddress) {
                 throw new BadRequest("ADR002", "Invalid wallet address for network " + network);
             }
 
-
-
             DocumentReference sellerRef = db.collection("sellers").document(sellerId);
 
+            // Prepare updates
             Map<String, Object> updates = new HashMap<>();
-            updates.put(networkField, finalAddress);
 
-            updates.put("currencyStatuses." + network + "." + currency, true);
+            // Add/update the currency-specific address
+            String currencyNetworkKey = currency + "_" + network;
+            updates.put(currencyNetworkKey, address);
 
-            updates.put(currency + "_" + network, finalAddress);
-
+            // Update timestamp
             updates.put("updatedAt", FieldValue.serverTimestamp());
 
+            // Perform the update
             sellerRef.set(updates, SetOptions.merge()).get();
 
+            // Prepare response
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("status", "success");
             responseData.put("network", network);
             responseData.put("currency", currency);
-            responseData.put("address", finalAddress);
-            responseData.put("currencyKey", currency + "_" + network);
+            responseData.put("address", address);
+            responseData.put("currencyKey", currencyNetworkKey);
             responseData.put("sellerId", sellerId);
             responseData.put("message", "Seller currency enabled and address updated successfully");
 

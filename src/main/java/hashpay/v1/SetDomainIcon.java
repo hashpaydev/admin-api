@@ -10,27 +10,28 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.firebase.auth.UserRecord;
-import abek.endpoint.AuthEndpoint;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
+import hashpay.v1.auth.AuthEndpoint;
 
 import static com.google.firebase.cloud.FirestoreClient.getFirestore;
 import static com.google.firebase.cloud.StorageClient.getInstance;
 
 public class SetDomainIcon extends AuthEndpoint {
-    private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(SetDomainIcon.class.getName());
+    private static final Logger logger = Logger.getLogger(SetDomainIcon.class.getName());
     private static final long MAX_FILE_SIZE = 2 * 1024 * 1024;
-    // Use the default bucket
     private static final String BUCKET_NAME = "hashpaytest.firebasestorage.app";
     private static final String[] ALLOWED_CONTENT_TYPES = {
             "image/jpeg", "image/png", "image/gif", "image/svg+xml", "image/webp"
@@ -43,25 +44,19 @@ public class SetDomainIcon extends AuthEndpoint {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            logger.info("Initializing Firestore connection");
             Firestore db = getFirestore();
             if (db == null) {
                 logger.severe("Firestore initialization failed");
                 throw new BadRequest("Failed to initialize Firestore");
             }
-            logger.info("Firestore connection established");
 
-            logger.info("Initializing Firebase Storage connection");
             Storage storage = getInstance().bucket(BUCKET_NAME).getStorage();
             if (storage == null) {
                 logger.severe("Firebase Storage initialization failed");
                 throw new BadRequest("Failed to initialize Firebase Storage");
             }
-            logger.info("Firebase Storage connection established");
 
             String domain = request.getParameter("domain");
-            logger.info("Request parameter: domain=" + domain);
-
             if (domain == null || domain.trim().isEmpty()) {
                 throw new BadRequest("Missing required parameter: domain");
             }
@@ -72,7 +67,6 @@ public class SetDomainIcon extends AuthEndpoint {
                 throw new BadRequest("Invalid domain format");
             }
 
-            logger.info("Checking if domain exists in Firestore");
             DocumentReference docRef = db.collection("domains").document(domain);
             DocumentSnapshot document = docRef.get().get();
 
@@ -105,19 +99,18 @@ public class SetDomainIcon extends AuthEndpoint {
                     throw new BadRequest("Invalid file type. Allowed types: JPEG, PNG, GIF, SVG, WebP");
                 }
 
+                byte[] fileContent = readAllBytes(filePart.getInputStream());
+
                 String fileExtension = getFileExtension(contentType);
                 String fileName = domain + "_" + UUID.randomUUID().toString() + fileExtension;
                 String objectPath = "domains/" + domain + "/" + fileName;
 
                 logger.info("Uploading file to Firebase Storage: " + objectPath);
-                InputStream fileContent = filePart.getInputStream();
                 BlobId blobId = BlobId.of(BUCKET_NAME, objectPath);
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                         .setContentType(contentType)
                         .build();
-
-                storage.create(blobInfo, fileContent);
-                
+                Blob blob = storage.create(blobInfo, fileContent);
                 String iconUrl = String.format("https://storage.googleapis.com/%s/%s", BUCKET_NAME, objectPath);
                 logger.info("File uploaded successfully: " + iconUrl);
 
@@ -172,12 +165,22 @@ public class SetDomainIcon extends AuthEndpoint {
             return result;
         } catch (Exception e) {
             logger.severe("Unexpected error: " + e.getClass().getName() + ": " + e.getMessage());
-            e.printStackTrace();
             result.put("status", "error");
             result.put("code", 500);
             result.put("message", "Unexpected error: " + e.getMessage());
             return result;
         }
+    }
+
+    private byte[] readAllBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int nRead;
+        byte[] data = new byte[1024];
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+        return buffer.toByteArray();
     }
 
     private String getFileExtension(String contentType) {
