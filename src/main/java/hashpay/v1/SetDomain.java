@@ -6,13 +6,10 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.auth.UserRecord;
-import com.google.gson.JsonObject;
-
-import hashpay.v1.auth.AuthEndpoint;
+import abek.endpoint.AuthEndpoint;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -21,7 +18,8 @@ import java.util.logging.Logger;
 import static com.google.firebase.cloud.FirestoreClient.getFirestore;
 
 public class SetDomain extends AuthEndpoint {
-    private static final Logger logger = Logger.getLogger(SetDomain.class.getName());
+    private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(SetDomain.class.getName());
 
     @Override
     protected Map<String, Object> process(UserRecord user, HttpServletRequest request, HttpServletResponse response)

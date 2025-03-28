@@ -19,7 +19,8 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class CheckTronWallet extends PublicEndpoint {
-    private static final Logger logger = Logger.getLogger(CheckTronWallet.class.getName());
+    private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(CheckTronWallet.class.getName());
     private static final String QUICKNODE_URL = "https://weathered-few-snowflake.tron-mainnet.quiknode.pro/3b0e06b8398cd962918f4a95f0b63ff285ad3864";
 
     @Override

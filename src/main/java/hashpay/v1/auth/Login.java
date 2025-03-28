@@ -16,6 +16,7 @@ import abek.exceptions.BadRequest;
 import abek.exceptions.HttpError;
 
 public class Login extends PublicEndpoint {
+	private static final long serialVersionUID = 1L;
     private static final Gson gson = new Gson();
     private static final String FIREBASE_API_KEY = "AIzaSyDKMJiV-a1dandXcqTJTGofwUvZMsw1V9I";
 

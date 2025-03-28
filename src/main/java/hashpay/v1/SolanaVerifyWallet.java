@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class SolanaVerifyWallet extends PublicEndpoint {
+	private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(SolanaVerifyWallet.class.getName());
     private static final RpcClient rpcClient = new RpcClient("https://weathered-few-snowflake.solana-mainnet.quiknode.pro/3b0e06b8398cd962918f4a95f0b63ff285ad3864");
 

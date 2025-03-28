@@ -7,7 +7,7 @@ import com.google.firebase.auth.UserRecord;
 import com.google.gson.Gson;
 
 import hashpay.entity.Seller;
-import hashpay.v1.auth.AuthEndpoint;
+import abek.endpoint.AuthEndpoint;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -21,7 +21,7 @@ import static com.google.firebase.cloud.FirestoreClient.getFirestore;
 
 public class EnableCurrency extends AuthEndpoint {
     private static final long serialVersionUID = 1L;
-    private static final Gson gson = new Gson();
+    //private static final Gson gson = new Gson();
 
     private static final List<String> SUPPORTED_NETWORKS = Arrays.asList("SOL", "ETH", "TRX");
     private static final List<String> SUPPORTED_CURRENCIES = Arrays.asList("USDC", "USDT", "EUR");

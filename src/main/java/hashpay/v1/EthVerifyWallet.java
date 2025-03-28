@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class EthVerifyWallet extends PublicEndpoint {
+	private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(EthVerifyWallet.class.getName());
     private static final String ETHEREUM_RPC_URL = "https://weathered-few-snowflake.quiknode.pro/3b0e06b8398cd962918f4a95f0b63ff285ad3864";
     private static final Web3j web3j = Web3j.build(new HttpService(ETHEREUM_RPC_URL));

@@ -8,7 +8,6 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -23,7 +22,6 @@ import static com.google.firebase.cloud.FirestoreClient.getFirestore;
 
 public class SetPayoutAdrEndpoint extends AuthEndpoint {
     private static final long serialVersionUID = 1L;
-    private static final Gson gson = new Gson();
 
     private static final Set<String> VALID_NETWORKS = Set.of("SOL", "ETH", "TRX");
     private static final Set<String> VALID_CURRENCIES = Set.of("USDC", "USDT");

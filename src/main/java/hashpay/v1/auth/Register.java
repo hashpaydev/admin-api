@@ -3,7 +3,6 @@ package hashpay.v1.auth;
 import abek.endpoint.PublicEndpoint;
 import abek.exceptions.BadRequest;
 import abek.exceptions.HttpError;
-import abek.util.HTTP;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.SetOptions;
@@ -27,7 +26,8 @@ import static com.google.firebase.cloud.FirestoreClient.getFirestore;
 
 
 public class Register extends PublicEndpoint {
-    private static final Gson gson = new Gson();
+    private static final long serialVersionUID = 1L;
+	private static final Gson gson = new Gson();
     private static final String FIREBASE_API_KEY = "AIzaSyDii8mqfU_rNQ9oMDs5bpCacniGvpgywno";
 
     @Override

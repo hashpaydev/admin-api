@@ -10,15 +10,12 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.firebase.auth.UserRecord;
-import com.google.gson.JsonObject;
-
-import hashpay.v1.auth.AuthEndpoint;
+import abek.endpoint.AuthEndpoint;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +27,8 @@ import static com.google.firebase.cloud.FirestoreClient.getFirestore;
 import static com.google.firebase.cloud.StorageClient.getInstance;
 
 public class SetDomainIcon extends AuthEndpoint {
-    private static final Logger logger = Logger.getLogger(SetDomainIcon.class.getName());
+    private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(SetDomainIcon.class.getName());
     private static final long MAX_FILE_SIZE = 2 * 1024 * 1024;
     // Use the default bucket
     private static final String BUCKET_NAME = "hashpaytest.firebasestorage.app";
@@ -118,7 +116,8 @@ public class SetDomainIcon extends AuthEndpoint {
                         .setContentType(contentType)
                         .build();
 
-                Blob blob = storage.create(blobInfo, fileContent);
+                storage.create(blobInfo, fileContent);
+                
                 String iconUrl = String.format("https://storage.googleapis.com/%s/%s", BUCKET_NAME, objectPath);
                 logger.info("File uploaded successfully: " + iconUrl);
 
