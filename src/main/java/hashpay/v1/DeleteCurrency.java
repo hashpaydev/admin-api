@@ -20,7 +20,6 @@ import static com.google.firebase.cloud.FirestoreClient.getFirestore;
 
 public class DeleteCurrency extends AuthEndpoint {
     private static final long serialVersionUID = 1L;
-    //private static final Gson gson = new Gson();
 
     private static final List<String> SUPPORTED_NETWORKS = Arrays.asList("SOL", "ETH", "TRX");
     private static final List<String> SUPPORTED_CURRENCIES = Arrays.asList("USDC", "USDT", "EUR");
@@ -55,25 +54,19 @@ public class DeleteCurrency extends AuthEndpoint {
                 throw new BadRequest("CUR002", "Unsupported currency: " + currency);
             }
 
-            // Prepare update map
             Map<String, Object> updates = new HashMap<>();
 
-            // Remove currency-specific field
             String currencyNetworkKey = currency + "_" + network;
             updates.put(currencyNetworkKey, FieldValue.delete());
 
-            // Update currency statuses
             Map<String, Object> currencyStatusesUpdate = new HashMap<>();
             currencyStatusesUpdate.put(currency, FieldValue.delete());
             updates.put("currencyStatuses." + network, currencyStatusesUpdate);
 
-            // Update timestamp
             updates.put("updatedAt", FieldValue.serverTimestamp());
 
-            // Perform the update
             sellerRef.set(updates, SetOptions.merge()).get();
 
-            // Prepare response
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("status", "success");
             responseData.put("network", network);

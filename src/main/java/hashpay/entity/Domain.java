@@ -27,7 +27,7 @@ public class Domain {
 		} else if (doc.contains("emailNotification")) {
 			notify = doc.getBoolean("emailNotification");
 		} else {
-			notify = false; // Default value
+			notify = false;
 		}
 	}
 }
